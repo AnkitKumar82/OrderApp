@@ -40,10 +40,25 @@ async function add(attrs = {}) {
   }
 
   const order = await Order.create(createProps)
+  const {
+    placedAt,
+    status,
+    totalAmount,
+    _id
+  } = order.toObject ? order.toObject() : order
+
   if(order) {
     await TrackerModel.updateCapacityById(trackerId, {remainingCapacity : remainingCapacity - orderedUnits})
   }
-  return order
+  const result = {
+    id: _id,
+    placedAt,
+    status,
+    totalAmount,
+    pricePerUnit,
+    orderedUnits
+  }
+  return result
 }
 
 async function updateById(id = '', attrs = {}) {

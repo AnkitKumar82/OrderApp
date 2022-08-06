@@ -38,6 +38,9 @@ async function updateCapacityById(id = '', attrs = {}) {
 }
 
 async function checkCapacity(date) {
+  if (!date) {
+    throw Errors.BAD_REQUEST
+  }
   const uniqueIdf = moment(date, 'DD-MM-YYYY').format('DDMMYYYY')
   const tracker = await findByUniqueIdf(uniqueIdf)
   const { remainingCapacity, totalCapacity } = tracker

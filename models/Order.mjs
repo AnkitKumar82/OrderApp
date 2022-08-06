@@ -1,7 +1,6 @@
 import { OrderSchema } from '../Schema/index.mjs'
 import mongoose from 'mongoose'
-import moment from 'moment-timezone'
-import { Errors } from '../constants/index.mjs'
+import { Errors, Status } from '../constants/index.mjs'
 import TrackerModel from './Tracker.mjs'
 const { model } = mongoose
 
@@ -18,6 +17,11 @@ async function add(attrs = {}) {
   const { 
     orderedUnits = 0 
   } = attrs
+
+  if(orderedUnits < 1) {
+    throw Errors.BAD_REQUEST
+  }
+
   const tracker = await TrackerModel.todayTracker()
   const { 
     _id: trackerId,
@@ -43,6 +47,9 @@ async function add(attrs = {}) {
 }
 
 async function updateById(id = '', attrs = {}) {
+  if (!id) {
+    throw Errors.BAD_REQUEST
+  }
   const options = {
     new: true 
   } 
@@ -54,8 +61,12 @@ async function updateById(id = '', attrs = {}) {
 }
 
 async function updateStatusById(id = '', attrs = {}) {
-  //Allow only status update
   const { status = '' } = attrs
+
+  if (!id || !Status.ENUM.includes(status)) {
+    throw Errors.BAD_REQUEST
+  }
+
   const options = {
     new: true 
   } 
@@ -67,6 +78,9 @@ async function updateStatusById(id = '', attrs = {}) {
 }
 
 async function deleteById(id = '') {
+  if (!id) {
+    throw Errors.BAD_REQUEST
+  }
   const order = await Order.findByIdAndDelete(id) 
   if (!order) {
     throw Errors.ORDER_NOT_FOUND_BY_ID
